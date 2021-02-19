@@ -1,11 +1,15 @@
-import { IKeyValueMap, IChannel } from "./type";
-declare const _: {
-    notify(eventName: string, ...rest: any[]): any;
+import { IEvents, IToBeNotify } from "./type";
+export declare const EVENT_PREFIX = "TPE";
+declare class Event {
+    Events: IEvents;
+    toBeNotify: IToBeNotify[];
+    _scope: any;
+    notify(eventName: string, ...rest: any[]): this;
     has(eventName: string): boolean;
     notifyWith(eventName: string, scope: any, ...rest: any[]): void;
-    subscribe(eventName: string, callback: Function): any;
-    unsubscribe(eventName: string, callback?: Function): any;
+    subscribe(eventName: string, callback: Function | Function[]): this;
+    unsubscribe(eventName: string, callback?: Function): this;
     guid(): string;
-    call(api: string, data: IKeyValueMap, callback: Function, channel: IChannel): any;
-};
-export default _;
+    clear(): void;
+}
+export default Event;

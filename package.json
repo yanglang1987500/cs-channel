@@ -1,15 +1,21 @@
 {
-    "name": "cs-channel",
-    "version": "1.0.0",
-    "description": "",
-    "main": "./lib/index.js",
-    "module": "./es/index.js",
-    "types": "./lib/index.d.ts",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "rm -rf ./lib && rm -rf ./es && tsc -p tsconfig.json && tsc -p tsconfig.es6.json"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC"
+  "name": "cs-channel",
+  "version": "1.0.4",
+  "description": "",
+  "main": "./lib/index.js",
+  "module": "./es/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "build": "rm -rf ./lib && rm -rf ./es && tsc -p tsconfig.json && tsc -p tsconfig.es6.json",
+    "test": "jest --coverage -u"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.4"
+  }
 }

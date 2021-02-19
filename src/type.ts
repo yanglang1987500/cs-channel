@@ -3,9 +3,10 @@ export interface IKeyValueMap {
 	[key: string]: any;
 }
 
-export interface IMessage {
+export interface IMessage<T=IKeyValueMap> {
 	api: string;
-	data: IKeyValueMap;
+  data: T;
+  error?: Error;
 	msgId: string;
 }
 
@@ -21,7 +22,8 @@ export interface IToBeNotify {
 
 export interface IOptions {
 	sender: (message: IMessage) => void;
-	receiver: (callback: IReceiverCallback) => void;
+  receiver: (callback: IReceiverCallback) => void;
+  serializeError?: boolean;
 }
 
 export interface IChannel {

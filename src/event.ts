@@ -1,20 +1,23 @@
-import { IEvents, IToBeNotify, IKeyValueMap, IChannel, IMessage } from "./type";
+import { IEvents, IToBeNotify } from "./type";
 
-const Events: IEvents = {};
-const toBeNotify: IToBeNotify[] = [];
-const EVENT_PREFIX = 'TPE';
+export const EVENT_PREFIX = 'TPE';
 
-const _ = {
+class Event {
+
+  Events: IEvents = {};
+  toBeNotify: IToBeNotify[] = [];
+  _scope = null;
+
 	notify(eventName: string, ...rest: any[]) {
-		const eventList = Events[eventName];
+		const eventList = this.Events[eventName];
 		let i = 0;
 		if (eventList) {
 			const len = eventList.length;
 			for (; i < len; i += 1) {
-				eventList[i].apply(this, rest);
+				eventList[i].apply(this._scope || this, rest);
 			}
 		} else {
-			toBeNotify.push({
+			this.toBeNotify.push({
 				eventName,
 				data: rest,
 				scope: this,
@@ -22,45 +25,48 @@ const _ = {
 		}
 		if (eventName.startsWith(`${EVENT_PREFIX}_`)) { this.unsubscribe(eventName); }
 		return this;
-	},
+	}
 	has(eventName: string) {
-		return Events[eventName] && Events[eventName].length > 0;
-	},
+		return !!(this.Events[eventName] && this.Events[eventName].length > 0);
+	}
 	notifyWith(eventName: string, scope: any, ...rest: any[]) {
-		if (arguments.length < 2) { throw new TypeError('arguments error'); }
-		this.notify.apply(scope, [eventName, ...rest]);
-	},
-	subscribe(eventName: string, callback: Function) {
+    if (arguments.length < 2) { throw new TypeError('arguments error'); }
+    this._scope = scope;
+    this.notify(eventName, ...rest);
+    this._scope = null;
+	}
+	subscribe(eventName: string, callback: Function | Function[]) {
 		let i = 0;
-		const len = toBeNotify.length;
+		const len = this.toBeNotify.length;
 		if (arguments.length < 2) { throw new TypeError('arguments error '); }
 
-		let eventList = Events[eventName] ? Events[eventName] : (Events[eventName] = []);
+		let eventList = this.Events[eventName] ? this.Events[eventName] : (this.Events[eventName] = []);
 		if (Object.prototype.toString.call(callback) === '[object Array]') {
 			eventList = eventList.concat(callback);
 		} else {
-			eventList.push(callback);
-		}
+			eventList.push(callback as Function);
+    }
+    this.Events[eventName] = eventList;
 		for (; i < len; i += 1) {
-			if (toBeNotify[i].eventName === eventName) {
-				this.notify.apply(toBeNotify[i].scope, [eventName, ...toBeNotify[i].data]);
-				toBeNotify.splice(i, 1);
+			if (this.toBeNotify[i].eventName === eventName) {
+				this.notify.apply(this.toBeNotify[i].scope, [eventName, ...this.toBeNotify[i].data]);
+				this.toBeNotify.splice(i, 1);
 				break;
 			}
 		}
 		return this;
-	},
+	}
 	unsubscribe(eventName: string, callback?: Function) {
 		if (callback) {
-			const callbacks = Events[eventName];
+			const callbacks = this.Events[eventName];
 			for (let i = 0; i < callbacks.length; i += 1) {
 				if (callbacks[i] === callback) {
 					callbacks.splice(i -= 1, 1);
 				}
 			}
-		} else { delete Events[eventName]; }
+		} else { delete this.Events[eventName]; }
 		return this;
-	},
+	}
 	guid() {
 		return 'xxxxxxxx_xxxx_4xxx_yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
 			/* eslint-disable */
@@ -69,28 +75,12 @@ const _ = {
 			/* eslint-enable */
 			return v.toString(16);
 		});
-	},
-  /*
-   * @method call
-   * @param api
-   * @param data Object
-   * @param alive
-   */
-	call(api: string, data: IKeyValueMap, callback: Function, channel: IChannel) {
-		let eventName = '';
-		if (callback) {
-			eventName = `${EVENT_PREFIX}_${this.guid()}`;
-			this.subscribe(eventName, callback);
-		}
-		const message: IMessage = {
-			api,
-			data,
-			msgId: eventName,
-		};
+  }
+  clear() {
+    this.Events = {};
+    this.toBeNotify = [];
+  }
 
-		channel.options.sender(message);
-		return this;
-	},
 };
 
-export default _;
+export default Event;

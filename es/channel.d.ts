@@ -1,13 +1,18 @@
-import { IOptions, IKeyValueMap, IMessage } from './type';
+import Event from './event';
+import { IOptions, IKeyValueMap } from './type';
 declare class Channel {
+    _: Event;
+    id: string;
+    serializeError: boolean;
     options: {
         sender: (message: any) => any;
         receiver: (callback: any) => any;
     };
-    constructor(option: IOptions);
+    constructor(option: IOptions, id?: string);
     init(option: IOptions): void;
     call<T = any>(api: string, data?: IKeyValueMap): Promise<T>;
-    on(api: string, callback: (message: IMessage) => Promise<any>): void;
+    doCall(api: string, data: IKeyValueMap, callback: Function): void;
+    on<T = any>(api: string, callback: (data: T) => Promise<any>): void;
     off(api: string): void;
 }
 export default Channel;
