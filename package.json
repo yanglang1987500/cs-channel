@@ -1,0 +1,15 @@
+{
+    "name": "cs-channel",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./lib/index.js",
+    "module": "./es/index.js",
+    "types": "./lib/index.d.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "rm -rf ./lib && rm -rf ./es && tsc -p tsconfig.json && tsc -p tsconfig.es6.json"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}
