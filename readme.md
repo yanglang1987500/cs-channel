@@ -33,6 +33,8 @@ try {
 初始化`channel`实例，定义`sender`发送与`receiver`接收两个回调（用vscode的webview开发举例）：
 ## 客户端
 ```javascript
+  import Channel from 'cs-channel'
+  
   const vscode = acquireVsCodeApi();
   const clientChannel = new Channel({
     sender: message => void vscode.postMessage(message),
@@ -45,6 +47,8 @@ try {
 ```
 ## 服务端
 ```javascript
+  import Channel from 'cs-channel'
+  
   const serverChannel = new Channel({
     sender: message => void panel.webview.postMessage(message),
     receiver: callback => {
